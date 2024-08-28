@@ -1,16 +1,14 @@
 use std::env;
 use std::sync::Arc;
-use tokio::sync::RwLock;
-
-use teloxide::{filter_command, prelude::*, update_listeners, utils::command::BotCommands};
-use teloxide::{ApiError, RequestError};
-
-use async_openai::Client;
 
 use async_openai::config::OpenAIConfig;
-
-use async_openai::types::CreateChatCompletionRequestArgs;
-use async_openai::types::{ChatCompletionRequestMessage, ChatCompletionRequestUserMessage};
+use async_openai::types::{
+    ChatCompletionRequestMessage, ChatCompletionRequestUserMessage, CreateChatCompletionRequestArgs,
+};
+use async_openai::Client;
+use teloxide::{filter_command, prelude::*, update_listeners, utils::command::BotCommands};
+use teloxide::{ApiError, RequestError};
+use tokio::sync::RwLock;
 
 #[tokio::main]
 async fn main() {
