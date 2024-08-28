@@ -1,0 +1,15 @@
+[package]
+name = "kimi-bot"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "kimi-bot"
+path = "src/main.rs"
+
+[dependencies]
+teloxide = { version = "0.13.0", features = ["default", "macros", "webhooks-axum"] }
+async-openai = { version = "0.23.4", features = ["default"] }
+tokio = { version = "1.39.3", features = ["full"] }
+log = "0.4.22"
+pretty_env_logger = "0.5.0"

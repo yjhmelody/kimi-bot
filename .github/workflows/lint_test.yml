@@ -1,0 +1,76 @@
+name: Lint & Test
+
+on:
+  push:
+    branches: ["master", "main"]
+    paths-ignore:
+      - "**/*.md"
+      - ".github/**"
+      - .gitignore
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - ".github/**"
+      - .gitignore
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTC_WRAPPER: sccache
+  SCCACHE_GHA_ENABLED: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: RUST toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo registry & git sources
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }}
+            ${{ runner.os }}-cargo-lint-
+            ${{ runner.os }}-cargo-
+
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@v0.0.5
+
+      - name: Check clippy
+        run: cargo clippy
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: RUST toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo registry & git sources
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
+            ${{ runner.os }}-cargo-test-
+            ${{ runner.os }}-cargo-
+
+      - name: Run sccache
+        uses: mozilla-actions/sccache-action@v0.0.5
+
+      - name: Run tests
+        run: cargo test
