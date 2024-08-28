@@ -69,3 +69,5 @@ jobs:
           allowUpdates: true
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') || contains(github.ref, 'pre') }}
           draft: true
+          token: ${{ secrets.ACTION_TOKEN }}
+
