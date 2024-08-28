@@ -70,10 +70,7 @@ impl State {
 }
 
 #[derive(BotCommands, Clone)]
-#[command(
-    rename_rule = "lowercase",
-    description = "These commands are supported:"
-)]
+#[command(rename_rule = "lowercase", description = "These commands are supported:")]
 enum Command {
     #[command(description = "display this text.")]
     Help,
@@ -87,33 +84,23 @@ async fn answer(bot: Bot, state: SharedState, cmd: Command, msg: Message) -> Res
         state.messages_total += 1;
     }
     let id = msg.chat.id;
-    let f =  async {
+    let f = async {
         match cmd {
-            Command::Help => {
-                bot.send_message(id, Command::descriptions().to_string())
-                    .await?
-            }
+            Command::Help => bot.send_message(id, Command::descriptions().to_string()).await?,
             Command::Kimi(text) => {
                 let request = CreateChatCompletionRequestArgs::default()
                     // must use moonshot model
                     .model("moonshot-v1-8k")
-                    .messages([ChatCompletionRequestMessage::User(
-                        ChatCompletionRequestUserMessage {
-                            content: text.into(),
-                            ..Default::default()
-                        },
-                    )])
+                    .messages([ChatCompletionRequestMessage::User(ChatCompletionRequestUserMessage {
+                        content: text.into(),
+                        ..Default::default()
+                    })])
                     .build()
                     .map_err(unknown_error)?;
 
                 let response = {
                     let state = state.read().await;
-                    state
-                        .client
-                        .chat()
-                        .create(request)
-                        .await
-                        .map_err(unknown_error)?
+                    state.client.chat().create(request).await.map_err(unknown_error)?
                 };
 
                 let reply = response.choices[0]
